@@ -17,7 +17,6 @@ type AuthFormData = z.infer<typeof authSchema>;
 
 export function AuthForm() {
   const navigate = useNavigate();
-  const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,34 +38,16 @@ export function AuthForm() {
     setError(null);
 
     try {
-      if (isSignUp) {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: '',
-              username: data.email.split('@')[0],
-            },
-          },
-        });
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
 
-        if (signUpError) throw signUpError;
-
-        // After successful signup, automatically sign in
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-
-        if (signInError) throw signInError;
-      } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-
-        if (signInError) throw signInError;
+      if (signInError) {
+        throw signInError;
       }
 
       // Clear form and navigate to dashboard on success
@@ -74,11 +55,7 @@ export function AuthForm() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Auth error:', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Invalid credentials. Please check your email and password.'
-      );
+      setError('Invalid credentials. Please check your email and password.');
     } finally {
       setIsLoading(false);
     }
@@ -88,22 +65,8 @@ export function AuthForm() {
     <div className="w-full max-w-md space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold tracking-tight">
-          {isSignUp ? 'Create your account' : 'Sign in to your account'}
+          Sign in to your account
         </h2>
-        <p className="mt-2 text-sm text-gray-600">
-          {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError(null);
-              reset();
-            }}
-            className="font-medium text-primary hover:text-primary/90"
-          >
-            {isSignUp ? 'Sign in' : 'Sign up'}
-          </button>
-        </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -126,7 +89,7 @@ export function AuthForm() {
           <Input
             id="password"
             type="password"
-            autoComplete={isSignUp ? 'new-password' : 'current-password'}
+            autoComplete="current-password"
             {...register('password')}
             placeholder="Enter your password"
           />
@@ -142,11 +105,7 @@ export function AuthForm() {
         )}
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading
-            ? 'Please wait...'
-            : isSignUp
-            ? 'Create account'
-            : 'Sign in'}
+          {isLoading ? 'Please wait...' : 'Sign in'}
         </Button>
       </form>
     </div>
