@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { StoreProvider } from '@/components/providers/store-provider';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { AdminLayout } from '@/components/admin/admin-layout';
 import AuthPage from '@/pages/auth';
 import DashboardPage from '@/pages/dashboard';
+import MaintenancePage from '@/pages/maintenance';
 import UsersPage from '@/pages/admin/users';
 import CondominiumsPage from '@/pages/admin/condominiums';
 import DeliveryWindowsPage from '@/pages/admin/delivery-windows';
@@ -18,6 +19,7 @@ function App() {
         <AuthProvider>
           <Routes>
             <Route path="/" element={<AuthPage />} />
+            <Route path="/maintenance/*" element={<MaintenancePage />} />
             <Route
               path="/dashboard"
               element={
@@ -33,6 +35,8 @@ function App() {
               <Route path="payment-methods" element={<PaymentMethodsPage />} />
               <Route path="egg-sizes" element={<EggSizesPage />} />
             </Route>
+            {/* Catch any unmatched routes and redirect to maintenance */}
+            <Route path="/admin/*" element={<Navigate to="/maintenance" replace />} />
           </Routes>
         </AuthProvider>
       </Router>

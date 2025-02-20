@@ -11,6 +11,7 @@ import {
   LogOut,
   Truck,
   MessageSquare,
+  Wrench,
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -40,21 +41,9 @@ const sidebarLinks: SidebarLink[] = [
     roles: ['admin', 'customer', 'delivery'],
   },
   {
-    icon: Users,
-    label: 'Users',
-    href: '/users',
-    roles: ['admin'],
-  },
-  {
-    icon: Building2,
-    label: 'Condominiums',
-    href: '/condominiums',
-    roles: ['admin'],
-  },
-  {
-    icon: Truck,
-    label: 'Delivery Windows',
-    href: '/delivery-windows',
+    icon: Wrench,
+    label: 'Admin Menu',
+    href: '/maintenance',
     roles: ['admin'],
   },
   {
